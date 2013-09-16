@@ -1,0 +1,28 @@
+{
+  "name": "angularjs-google-places",
+  "version": "0.1.0",
+  "homepage": "https://github.com/arunisrael/angularjs-google-places",
+  "authors": [
+    "Arun Israel <arun.israel@gmail.com>"
+  ],
+  "description": "An angular.js wrapper around the Google Places API",
+  "main": "google-places.js",
+  "keywords": [
+    "google places",
+    "angular.js"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.x"
+  },
+  "devDependencies": {
+    "angular-mocks": "~1.x"
+  }
+}
