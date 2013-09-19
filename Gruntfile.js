@@ -19,7 +19,8 @@ module.exports = function(grunt) {
           beforeEach: true,
           angular: true,
           inject: true,
-          describe: true
+          describe: true,
+          afterEach: true
         }
       }
     },

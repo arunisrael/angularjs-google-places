@@ -17,7 +17,7 @@ provider('gPlacesAPI', function () {
         },
         format: 'json',
         types: 'food'
-    }
+    };
 
     this.buildParams = function (keys, options) {
         var obj = {};
@@ -25,20 +25,20 @@ provider('gPlacesAPI', function () {
             obj[opt] = options[opt];
         });
         return obj;
-    }
+    };
 
     this.parseNSJSON = function (response) {
         var pResp = [];
         var keys = ['name', 'reference', 'vicinity'];
-        response['results'].map(function (result) {
-            var obj = {}
+        response.results.map(function (result) {
+            var obj = {};
             angular.forEach(keys, function (k) {
                 obj[k] = result[k];
             });
             pResp.push(obj);
-        })
+        });
         return pResp;
-    }
+    };
 
     this.parsePDJSON = function (response) {
         var pResp = {};
@@ -46,10 +46,10 @@ provider('gPlacesAPI', function () {
             'reference', 'website'
         ];
         angular.forEach(keys, function (k) {
-            pResp[k] = response['result'][k];
+            pResp[k] = response.result[k];
         });
         return pResp;
-    }
+    };
 
     this.$get = function ($http, $q) {
         var opts = this.options;
@@ -62,9 +62,9 @@ provider('gPlacesAPI', function () {
             },
             placeSearch: function (cparams) {
                 var popts = angular.extend(opts, cparams);
-                var url = popts['nearbySearchURL'] + '/' + popts['format'];
+                var url = popts.nearbySearchURL + '/' + popts.format;
                 var location = {
-                    location: popts['latitude'] + ',' + popts['longitude']
+                    location: popts.latitude + ',' + popts.longitude
                 };
                 var deferred = $q.defer();
                 $http.get(url, {
@@ -81,7 +81,7 @@ provider('gPlacesAPI', function () {
 
             placeDetails: function (cparams) {
                 var popts = angular.extend(opts, cparams);
-                var url = popts['placeDetailsURL'] + '/' + popts['format'];
+                var url = popts.placeDetailsURL + '/' + popts.format;
                 var deferred = $q.defer();
                 $http.get(url, {
                     params: buildParams(['reference', 'sensor', 'key'],
@@ -93,7 +93,7 @@ provider('gPlacesAPI', function () {
                 });
                 return deferred.promise;
             }
-        }
+        };
     };
 
     this.setOptions = function (opts) {
