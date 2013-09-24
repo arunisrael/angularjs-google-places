@@ -1,36 +1,54 @@
 'use strict';
+/*
+look at github other provider examples to see how internal Fns are organized
+fix variable names opts cparams defaults
+better org defaults with _ naming convention for internally used vars?
+e.g. apifncalls should not be modified by user?
+maybe put those in constants?
+prettify source code
+why so many dependency injections?
+how to inject into provider? thats why common api needs to be under $get scope to get $q??
+tests - mock out gService with custom response
 
+readme
+plnkr with google img to adhere to TOS
+minify
+
+blog:
+why create map elem
+angular copy/extend issue with multiple callbacks? overwriting default shared opt
+post to google group for feedback
+rootscope apply
+
+ */
 angular.module('gPlaces', []);
+
+angular.module('gPlaces').value('googlePlaces',google.maps.places);
+angular.module('gPlaces').value('googleMaps',google.maps);
 
 angular.module('gPlaces').
 provider('gPlacesAPI', function () {
 
-    this.options = {
-        nearbySearchURL: 'https://maps.googleapis.com/maps/api/place/nearbysearch',
-        placeDetailsURL: 'https://maps.googleapis.com/maps/api/place/details',
-        key: null,
+    var defaults = {
         radius: 1000,
         sensor: false,
-        location: {
-            latitude: null,
-            longitude: null
-        },
-        format: 'json',
-        types: 'food'
-    };
-
-    this.buildParams = function (keys, options) {
-        var obj = {};
-        angular.forEach(keys, function (opt) {
-            obj[opt] = options[opt];
-        });
-        return obj;
+        latitude: null,
+        longitude: null,
+        types: ['food'],
+        map: null,
+        elem: null,
+        nearbySearchKeys: ['name','reference','vicinity'],
+        placeDetailsKeys: ['formatted_address', 'formatted_phone_number', 'reference', 'website'],
+        nearbySearchErr: 'error finding nearby places',
+        placeDetailsErr: 'error finding place details',
+        nearbySearchApiFnCall: 'nearbySearch',
+        placeDetailsApiFnCall: 'getDetails'
     };
 
     this.parseNSJSON = function (response) {
         var pResp = [];
-        var keys = ['name', 'reference', 'vicinity'];
-        response.results.map(function (result) {
+        var keys = defaults.nearbySearchKeys;
+        response.map(function (result) {
             var obj = {};
             angular.forEach(keys, function (k) {
                 obj[k] = result[k];
@@ -42,62 +60,74 @@ provider('gPlacesAPI', function () {
 
     this.parsePDJSON = function (response) {
         var pResp = {};
-        var keys = ['formatted_address', 'formatted_phone_number',
-            'reference', 'website'
-        ];
+        var keys = defaults.placeDetailsKeys;
         angular.forEach(keys, function (k) {
-            pResp[k] = response.result[k];
+            pResp[k] = response[k];
         });
         return pResp;
     };
 
-    this.$get = function ($http, $q) {
-        var opts = this.options;
-        var buildParams = this.buildParams;
+    this.$get = function ($http, $rootScope,$q,googleMaps,googlePlaces,$window) {
+        var opts = defaults;
         var parseNSJSON = this.parseNSJSON;
         var parsePDJSON = this.parsePDJSON;
-        return {
-            getOptions: function () {
-                return opts;
-            },
-            placeSearch: function (cparams) {
-                var popts = angular.extend(opts, cparams);
-                var url = popts.nearbySearchURL + '/' + popts.format;
-                var location = {
-                    location: popts.latitude + ',' + popts.longitude
-                };
-                var deferred = $q.defer();
-                $http.get(url, {
-                    params: angular.extend(buildParams(['radius',
-                        'types', 'names', 'sensor', 'key'
-                    ], popts), location)
-                }).success(function (data) {
-                    return deferred.resolve(parseNSJSON(data));
-                }).error(function () {
-                    deferred.reject('error finding nearby places');
-                });
-                return deferred.promise;
-            },
 
+        function commonAPI (options) {
+            var popts = angular.copy(defaults, {});
+            angular.extend(popts, options);
+            var deferred = $q.defer();
+            if (popts._genLocation) {
+                popts.location = new googleMaps.LatLng(popts.latitude,popts.longitude);
+            }
+            function callback(results, status) {
+                if (status == googlePlaces.PlacesServiceStatus.OK) {
+                    $rootScope.$apply(function(){
+                        return deferred.resolve(popts._parser(results));
+                    });
+                }
+                else {
+                    $rootScope.$apply(function(){
+                        deferred.reject(popts._errorMsg);
+                    });
+                }
+            }
+            var elem;
+            if (popts.map) {
+              elem = popts.map;
+            }
+            else if (popts.elem) {
+              elem = popts.elem;
+            }
+            else {
+              elem = $window.document.createElement('div');
+            }
+            var service = new googlePlaces.PlacesService(elem);
+            service[popts._apiFnCall](popts, callback);
+            return deferred.promise;
+        };
+
+        return {
+            getDefaults: function () {
+                return defaults;
+            },
+            nearbySearch: function (cparams) {
+                cparams._genLocation = true;
+                cparams._errorMsg = defaults.nearbySearchErr;
+                cparams._parser = parseNSJSON;
+                cparams._apiFnCall = defaults.nearbySearchApiFnCall;
+                return commonAPI(cparams);
+            },
             placeDetails: function (cparams) {
-                var popts = angular.extend(opts, cparams);
-                var url = popts.placeDetailsURL + '/' + popts.format;
-                var deferred = $q.defer();
-                $http.get(url, {
-                    params: buildParams(['reference', 'sensor', 'key'],
-                        popts)
-                }).success(function (data) {
-                    deferred.resolve(parsePDJSON(data));
-                }).error(function () {
-                    deferred.reject('error grabbing place details');
-                });
-                return deferred.promise;
+                cparams._errorMsg = defaults.placeDetailsErr;
+                cparams._parser = parsePDJSON;
+                cparams._apiFnCall = defaults.placeDetailsApiFnCall;
+                return commonAPI(cparams);
             }
         };
     };
 
-    this.setOptions = function (opts) {
-        angular.extend(this.options, opts);
+    this.setDefaults = function (opts) {
+        angular.extend(defaults, opts);
     };
 
 });
