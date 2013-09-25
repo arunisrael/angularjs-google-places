@@ -1,16 +1,5 @@
 'use strict';
-/*
-tests - mock out gService with custom response
-readme
-bower pkg
 
-blog:
-why create map elem
-angular copy/extend issue with multiple callbacks? overwriting default shared opt
-rootscope apply
-manual bootstrap?
-post to google group for feedback along with geolocation repo
- */
 angular.module('ngGPlaces', []);
 angular.module('ngGPlaces').value('gPlaces',google.maps.places);
 angular.module('ngGPlaces').value('gMaps',google.maps);

@@ -5,13 +5,13 @@ describe('Service: ngGPlacesAPI', function () {
 
     beforeEach(module('ngGPlaces','mockedNearbySearch','mockedPlaceDetails', function ($provide,ngGPlacesAPIProvider,defaultNSJSON,defaultPDJSON) {
         $provide.value('gPlaces',{
-            PlacesService:function(){
+            PlacesService: function(){
                 this.nearbySearch =  function(req,cb) {
                     cb(defaultNSJSON,true);
-                },
+                };
                 this.getDetails =  function(req,cb) {
                     cb(defaultPDJSON,true);
-                }
+                };
             },
             PlacesServiceStatus: {
                 'OK':true

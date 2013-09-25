@@ -9,7 +9,7 @@ module.exports = function ( config ) {
 
 		// list of files / patterns to load in the browser
 		files : [
-			'bower_components/angular/angular.js', 'bower_components/angular-mocks/angular-mocks.js', 'src/*.js', 'test/*.js', 'test/mock/*.js'
+			'bower_components/angular/angular.js', 'bower_components/angular-mocks/angular-mocks.js', 'src/google-api.js','src/angularjs-google-places.js', 'test/*.js', 'test/mock/*.js'
 		],
 
 		// list of files to exclude
@@ -50,6 +50,6 @@ module.exports = function ( config ) {
 
 		// Continuous Integration mode
 		// if true, it capture browsers, run tests and exit
-		singleRun : false
+		singleRun : true
 	});
 };
