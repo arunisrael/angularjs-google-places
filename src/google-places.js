@@ -1,33 +1,22 @@
 'use strict';
 /*
-look at github other provider examples to see how internal Fns are organized
-fix variable names opts cparams defaults
-better org defaults with _ naming convention for internally used vars?
-e.g. apifncalls should not be modified by user?
-maybe put those in constants?
-prettify source code
-why so many dependency injections?
-how to inject into provider? thats why common api needs to be under $get scope to get $q??
 tests - mock out gService with custom response
-
 readme
-plnkr with google img to adhere to TOS
-minify
+bower pkg
 
 blog:
 why create map elem
 angular copy/extend issue with multiple callbacks? overwriting default shared opt
-post to google group for feedback
 rootscope apply
-
+manual bootstrap?
+post to google group for feedback along with geolocation repo
  */
-angular.module('gPlaces', []);
+angular.module('ngGPlaces', []);
+angular.module('ngGPlaces').value('gPlaces',google.maps.places);
+angular.module('ngGPlaces').value('gMaps',google.maps);
 
-angular.module('gPlaces').value('googlePlaces',google.maps.places);
-angular.module('gPlaces').value('googleMaps',google.maps);
-
-angular.module('gPlaces').
-provider('gPlacesAPI', function () {
+angular.module('ngGPlaces').
+provider('ngGPlacesAPI', function () {
 
     var defaults = {
         radius: 1000,
@@ -39,13 +28,13 @@ provider('gPlacesAPI', function () {
         elem: null,
         nearbySearchKeys: ['name','reference','vicinity'],
         placeDetailsKeys: ['formatted_address', 'formatted_phone_number', 'reference', 'website'],
-        nearbySearchErr: 'error finding nearby places',
-        placeDetailsErr: 'error finding place details',
-        nearbySearchApiFnCall: 'nearbySearch',
-        placeDetailsApiFnCall: 'getDetails'
+        nearbySearchErr: 'Unable to find nearby places',
+        placeDetailsErr: 'Unable to find place details',
+        _nearbySearchApiFnCall: 'nearbySearch',
+        _placeDetailsApiFnCall: 'getDetails'
     };
 
-    this.parseNSJSON = function (response) {
+    var parseNSJSON = function (response) {
         var pResp = [];
         var keys = defaults.nearbySearchKeys;
         response.map(function (result) {
@@ -58,7 +47,7 @@ provider('gPlacesAPI', function () {
         return pResp;
     };
 
-    this.parsePDJSON = function (response) {
+    var parsePDJSON = function (response) {
         var pResp = {};
         var keys = defaults.placeDetailsKeys;
         angular.forEach(keys, function (k) {
@@ -67,67 +56,66 @@ provider('gPlacesAPI', function () {
         return pResp;
     };
 
-    this.$get = function ($http, $rootScope,$q,googleMaps,googlePlaces,$window) {
-        var opts = defaults;
-        var parseNSJSON = this.parseNSJSON;
-        var parsePDJSON = this.parsePDJSON;
+    this.$get = function ($rootScope,$q,gMaps,gPlaces,$window) {
 
-        function commonAPI (options) {
-            var popts = angular.copy(defaults, {});
-            angular.extend(popts, options);
+        function commonAPI (args) {
+            var req = angular.copy(defaults, {});
+            angular.extend(req, args);
             var deferred = $q.defer();
-            if (popts._genLocation) {
-                popts.location = new googleMaps.LatLng(popts.latitude,popts.longitude);
-            }
+            var elem, service;
             function callback(results, status) {
-                if (status == googlePlaces.PlacesServiceStatus.OK) {
+                if (status == gPlaces.PlacesServiceStatus.OK) {
                     $rootScope.$apply(function(){
-                        return deferred.resolve(popts._parser(results));
+                        return deferred.resolve(req._parser(results));
                     });
                 }
                 else {
                     $rootScope.$apply(function(){
-                        deferred.reject(popts._errorMsg);
+                        deferred.reject(req._errorMsg);
                     });
                 }
             }
-            var elem;
-            if (popts.map) {
-              elem = popts.map;
+            if (req._genLocation) {
+                req.location = new gMaps.LatLng(req.latitude,req.longitude);
             }
-            else if (popts.elem) {
-              elem = popts.elem;
+            if (req.map) {
+              elem = req.map;
+            }
+            else if (req.elem) {
+              elem = req.elem;
             }
             else {
               elem = $window.document.createElement('div');
             }
-            var service = new googlePlaces.PlacesService(elem);
-            service[popts._apiFnCall](popts, callback);
+            service = new gPlaces.PlacesService(elem);
+            service[req._apiFnCall](req, callback);
             return deferred.promise;
-        };
+        }
 
         return {
             getDefaults: function () {
                 return defaults;
             },
-            nearbySearch: function (cparams) {
-                cparams._genLocation = true;
-                cparams._errorMsg = defaults.nearbySearchErr;
-                cparams._parser = parseNSJSON;
-                cparams._apiFnCall = defaults.nearbySearchApiFnCall;
-                return commonAPI(cparams);
+            nearbySearch: function (args) {
+                args._genLocation = true;
+                args._errorMsg = defaults.nearbySearchErr;
+                args._parser = parseNSJSON;
+                args._apiFnCall = defaults._nearbySearchApiFnCall;
+                return commonAPI(args);
             },
-            placeDetails: function (cparams) {
-                cparams._errorMsg = defaults.placeDetailsErr;
-                cparams._parser = parsePDJSON;
-                cparams._apiFnCall = defaults.placeDetailsApiFnCall;
-                return commonAPI(cparams);
+            placeDetails: function (args) {
+                args._errorMsg = defaults.placeDetailsErr;
+                args._parser = parsePDJSON;
+                args._apiFnCall = defaults._placeDetailsApiFnCall;
+                return commonAPI(args);
             }
         };
     };
 
-    this.setDefaults = function (opts) {
-        angular.extend(defaults, opts);
+    this.$get.$inject = ['$rootScope','$q','gMaps','gPlaces','$window'];
+
+    this.setDefaults = function (args) {
+        angular.extend(defaults, args);
     };
 
 });

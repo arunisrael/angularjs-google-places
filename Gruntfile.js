@@ -4,7 +4,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     jshint: {
-      files: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
+      files: ['Gruntfile.js', 'src/google-places.js', 'test/**/*.js'],
       options: {
         // options here to override JSHint defaults
         globalstrict: true,
@@ -20,7 +20,8 @@ module.exports = function(grunt) {
           angular: true,
           inject: true,
           describe: true,
-          afterEach: true
+          afterEach: true,
+          google:true
         }
       }
     },

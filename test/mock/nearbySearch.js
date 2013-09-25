@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('mockedNearbySearch', [])
-  .value('defaultNSJSON',
+angular.module('mockedNearbySearch',[])
+  .constant('defaultNSJSON',
    [
      {
        "geometry": {

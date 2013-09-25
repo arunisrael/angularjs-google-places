@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mockedPlaceDetails', [])
-  .value('defaultPDJSON',
+  .constant('defaultPDJSON',
    {
      "formatted_address": "529 Kent Street, Sydney NSW, Australia",
      "formatted_phone_number": "(02) 9267 2900",
