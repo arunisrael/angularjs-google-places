@@ -3,27 +3,29 @@
 describe('Service: ngGPlacesAPI', function () {
     var ngGPlacesAPI, $rootScope;
 
-    beforeEach(module('ngGPlaces','mockedNearbySearch','mockedPlaceDetails', function ($provide,ngGPlacesAPIProvider,defaultNSJSON,defaultPDJSON) {
-        $provide.value('gPlaces',{
-            PlacesService: function(){
-                this.nearbySearch =  function(req,cb) {
-                    cb(defaultNSJSON,true);
-                };
-                this.getDetails =  function(req,cb) {
-                    cb(defaultPDJSON,true);
-                };
-            },
-            PlacesServiceStatus: {
-                'OK':true
-            }
-        });
-        $provide.value('gMaps',{
-            LatLng:function(){}
-        });
-        ngGPlacesAPIProvider.setDefaults({
-            sensor: true
-        });
-    }));
+    beforeEach(module('ngGPlaces', 'mockedNearbySearch',
+        'mockedPlaceDetails', function ($provide, ngGPlacesAPIProvider,
+            defaultNSJSON, defaultPDJSON) {
+            $provide.value('gPlaces', {
+                PlacesService: function () {
+                    this.nearbySearch = function (req, cb) {
+                        cb(defaultNSJSON, true);
+                    };
+                    this.getDetails = function (req, cb) {
+                        cb(defaultPDJSON, true);
+                    };
+                },
+                PlacesServiceStatus: {
+                    'OK': true
+                }
+            });
+            $provide.value('gMaps', {
+                LatLng: function () {}
+            });
+            ngGPlacesAPIProvider.setDefaults({
+                sensor: true
+            });
+        }));
 
     describe('Overriding Defaults', function () {
         var defaults;
@@ -43,15 +45,15 @@ describe('Service: ngGPlacesAPI', function () {
     });
 
     describe('Nearby Search', function () {
-        beforeEach(inject(function (_ngGPlacesAPI_,_$rootScope_) {
+        beforeEach(inject(function (_ngGPlacesAPI_, _$rootScope_) {
             ngGPlacesAPI = _ngGPlacesAPI_;
             $rootScope = _$rootScope_;
         }));
 
         it('should return nearby places for a location', function () {
             var results = ngGPlacesAPI.nearbySearch({
-                latitude:-33.8665433,
-                longitude:151.1956316
+                latitude: -33.8665433,
+                longitude: 151.1956316
             }).then(function (data) {
                 results = data;
             });
@@ -64,7 +66,7 @@ describe('Service: ngGPlacesAPI', function () {
     });
 
     describe('Place Details Search', function () {
-        beforeEach(inject(function (_ngGPlacesAPI_,_$rootScope_) {
+        beforeEach(inject(function (_ngGPlacesAPI_, _$rootScope_) {
             ngGPlacesAPI = _ngGPlacesAPI_;
             $rootScope = _$rootScope_;
         }));
@@ -72,8 +74,8 @@ describe('Service: ngGPlacesAPI', function () {
         it('should return nearby places for a location', function () {
             var results;
             ngGPlacesAPI.nearbySearch({
-                latitude:-33.8665433,
-                longitude:151.1956316
+                latitude: -33.8665433,
+                longitude: 151.1956316
             }).then(function (data) {
                 results = data;
             });

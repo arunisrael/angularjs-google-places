@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('ngGPlaces', []);
-angular.module('ngGPlaces').value('gPlaces',google.maps.places);
-angular.module('ngGPlaces').value('gMaps',google.maps);
+angular.module('ngGPlaces').value('gPlaces', google.maps.places);
+angular.module('ngGPlaces').value('gMaps', google.maps);
 
 angular.module('ngGPlaces').
 provider('ngGPlacesAPI', function () {
@@ -15,8 +15,10 @@ provider('ngGPlacesAPI', function () {
         types: ['food'],
         map: null,
         elem: null,
-        nearbySearchKeys: ['name','reference','vicinity'],
-        placeDetailsKeys: ['formatted_address', 'formatted_phone_number', 'reference', 'website'],
+        nearbySearchKeys: ['name', 'reference', 'vicinity'],
+        placeDetailsKeys: ['formatted_address', 'formatted_phone_number',
+            'reference', 'website'
+        ],
         nearbySearchErr: 'Unable to find nearby places',
         placeDetailsErr: 'Unable to find place details',
         _nearbySearchApiFnCall: 'nearbySearch',
@@ -45,36 +47,34 @@ provider('ngGPlacesAPI', function () {
         return pResp;
     };
 
-    this.$get = function ($rootScope,$q,gMaps,gPlaces,$window) {
+    this.$get = function ($rootScope, $q, gMaps, gPlaces, $window) {
 
-        function commonAPI (args) {
+        function commonAPI(args) {
             var req = angular.copy(defaults, {});
             angular.extend(req, args);
             var deferred = $q.defer();
             var elem, service;
+
             function callback(results, status) {
                 if (status == gPlaces.PlacesServiceStatus.OK) {
-                    $rootScope.$apply(function(){
+                    $rootScope.$apply(function () {
                         return deferred.resolve(req._parser(results));
                     });
-                }
-                else {
-                    $rootScope.$apply(function(){
+                } else {
+                    $rootScope.$apply(function () {
                         deferred.reject(req._errorMsg);
                     });
                 }
             }
             if (req._genLocation) {
-                req.location = new gMaps.LatLng(req.latitude,req.longitude);
+                req.location = new gMaps.LatLng(req.latitude, req.longitude);
             }
             if (req.map) {
-              elem = req.map;
-            }
-            else if (req.elem) {
-              elem = req.elem;
-            }
-            else {
-              elem = $window.document.createElement('div');
+                elem = req.map;
+            } else if (req.elem) {
+                elem = req.elem;
+            } else {
+                elem = $window.document.createElement('div');
             }
             service = new gPlaces.PlacesService(elem);
             service[req._apiFnCall](req, callback);
@@ -101,7 +101,7 @@ provider('ngGPlacesAPI', function () {
         };
     };
 
-    this.$get.$inject = ['$rootScope','$q','gMaps','gPlaces','$window'];
+    this.$get.$inject = ['$rootScope', '$q', 'gMaps', 'gPlaces', '$window'];
 
     this.setDefaults = function (args) {
         angular.extend(defaults, args);
