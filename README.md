@@ -22,10 +22,11 @@ See this [plunker](http://embed.plnkr.co/6kKlcbafz57lS7HEPPMx/preview)
 
 Usage
 --
+- Include the [Google Maps JS library](http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true_or_false) in your app
 - Add ngGPlaces as a dependency
 - Inject ngGPlacesAPI as a dependency to your controller or other service
 - Invoke the nearbySearch method and pass in a latitude/longitude
-- Invoke the placeDetails method and pass in a google places api reference id
+- Invoke the placeDetails method and pass in a Google Places reference id
 
 Example
 --
