@@ -19,13 +19,28 @@ provider('ngGPlacesAPI', function () {
         placeDetailsKeys: ['formatted_address', 'formatted_phone_number',
             'reference', 'website'
         ],
+        textSearchErr: 'Unable to find by text',
         nearbySearchErr: 'Unable to find nearby places',
         placeDetailsErr: 'Unable to find place details',
+        _textSearchApiFnCall: 'textSearch',
         _nearbySearchApiFnCall: 'nearbySearch',
         _placeDetailsApiFnCall: 'getDetails'
     };
 
     var parseNSJSON = function (response) {
+        var pResp = [];
+        var keys = defaults.nearbySearchKeys;
+        response.map(function (result) {
+            var obj = {};
+            angular.forEach(keys, function (k) {
+                obj[k] = result[k];
+            });
+            pResp.push(obj);
+        });
+        return pResp;
+    };
+
+    var parseTSJSON = function (response) {
         var pResp = [];
         var keys = defaults.nearbySearchKeys;
         response.map(function (result) {
@@ -91,6 +106,13 @@ provider('ngGPlacesAPI', function () {
                 args._parser = parseNSJSON;
                 args._apiFnCall = defaults._nearbySearchApiFnCall;
                 return commonAPI(args);
+            },
+            textSearch: function(args) {
+                args._genLocation = true;
+                args._errorMsg = defaults.textSearchErr;
+                args._parser = parseTSJSON;
+                args._apiFnCall = defaults._textSearchApiFnCall;
+                return commonAPI(args);  
             },
             placeDetails: function (args) {
                 args._errorMsg = defaults.placeDetailsErr;
