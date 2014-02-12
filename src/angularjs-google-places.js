@@ -12,7 +12,7 @@ provider('ngGPlacesAPI', function () {
         sensor: false,
         latitude: null,
         longitude: null,
-        types: ['food'],
+        // types: ['food'],
         map: null,
         elem: null,
         textSearchKeys: ['formatted_address', 'geometry', 'html_attributions','icon','id','name',
