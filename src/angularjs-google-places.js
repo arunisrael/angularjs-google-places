@@ -15,6 +15,8 @@ provider('ngGPlacesAPI', function () {
         types: ['food'],
         map: null,
         elem: null,
+        textSearchKeys: ['formatted_address', 'geometry', 'html_attributions','icon','id','name',
+            'opening_hours', 'rating','reference','types', 'vicinity'],
         nearbySearchKeys: ['name', 'reference', 'vicinity'],
         placeDetailsKeys: ['formatted_address', 'formatted_phone_number',
             'reference', 'website'
@@ -42,7 +44,7 @@ provider('ngGPlacesAPI', function () {
 
     var parseTSJSON = function (response) {
         var pResp = [];
-        var keys = defaults.nearbySearchKeys;
+        var keys = defaults.textSearchKeys;
         response.map(function (result) {
             var obj = {};
             angular.forEach(keys, function (k) {
