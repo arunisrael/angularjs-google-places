@@ -27,7 +27,7 @@ provider('ngGPlacesAPI', function () {
 
     var parseNSJSON = function (response) {
         var pResp = [];
-        var keys = defaults.nearbySearchKeys;
+        var keys = this.nearbySearchKeys;
         response.map(function (result) {
             var obj = {};
             angular.forEach(keys, function (k) {
@@ -40,7 +40,7 @@ provider('ngGPlacesAPI', function () {
 
     var parsePDJSON = function (response) {
         var pResp = {};
-        var keys = defaults.placeDetailsKeys;
+        var keys = this.placeDetailsKeys;
         angular.forEach(keys, function (k) {
             pResp[k] = response[k];
         });
