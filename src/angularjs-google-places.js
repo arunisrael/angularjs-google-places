@@ -12,15 +12,16 @@ provider('ngGPlacesAPI', function () {
         sensor: false,
         latitude: null,
         longitude: null,
-        types: ['food'],
+        // types: ['lodging'],
         map: null,
         elem: null,
-        nearbySearchKeys: ['name', 'reference', 'vicinity'],
-        placeDetailsKeys: ['formatted_address', 'formatted_phone_number',
-            'reference', 'website'
-        ],
+        textSearchKeys: ['formatted_address','geometry','id','name','place_id','price_level','rating','reference','types'],
+        nearbySearchKeys: ['geometry','id','name','place_id','rating','reference','types'],
+        placeDetailsKeys: ['formatted_address','formatted_phone_number','geometry','html_attributions','icon','id','international_phone_number','name','opening_hours','photos','place_id','price_level','rating','reference','reviews','types', 'vicinity','website'],
+        textSearchErr: 'Unable to find by text',
         nearbySearchErr: 'Unable to find nearby places',
         placeDetailsErr: 'Unable to find place details',
+        _textSearchApiFnCall: 'textSearch',
         _nearbySearchApiFnCall: 'nearbySearch',
         _placeDetailsApiFnCall: 'getDetails'
     };
@@ -28,6 +29,19 @@ provider('ngGPlacesAPI', function () {
     var parseNSJSON = function (response) {
         var pResp = [];
         var keys = defaults.nearbySearchKeys;
+        response.map(function (result) {
+            var obj = {};
+            angular.forEach(keys, function (k) {
+                obj[k] = result[k];
+            });
+            pResp.push(obj);
+        });
+        return pResp;
+    };
+
+  var parseTSJSON = function (response) {
+        var pResp = [];
+        var keys = defaults.textSearchKeys;
         response.map(function (result) {
             var obj = {};
             angular.forEach(keys, function (k) {
@@ -47,8 +61,7 @@ provider('ngGPlacesAPI', function () {
         return pResp;
     };
 
-    this.$get = function ($q, gMaps, gPlaces, $window) {
-
+    this.$get = function ($rootScope, $q, gMaps, gPlaces, $window) {
         function commonAPI(args) {
             var req = angular.copy(defaults, {});
             angular.extend(req, args);
@@ -57,9 +70,13 @@ provider('ngGPlacesAPI', function () {
 
             function callback(results, status) {
                 if (status == gPlaces.PlacesServiceStatus.OK) {
-                  return deferred.resolve(req._parser(results));
+                    $rootScope.$apply(function () {
+                        return deferred.resolve(req._parser(results));
+                    });
                 } else {
-                  deferred.reject(req._errorMsg);
+                    $rootScope.$apply(function () {
+                        deferred.reject(req._errorMsg);
+                    });
                 }
             }
             if (req._genLocation) {
@@ -88,16 +105,26 @@ provider('ngGPlacesAPI', function () {
                 args._apiFnCall = defaults._nearbySearchApiFnCall;
                 return commonAPI(args);
             },
+            textSearch: function(args) {
+                args._genLocation = true;
+                args._errorMsg = defaults.textSearchErr;
+                args._parser = parseTSJSON;
+                args._apiFnCall = defaults._textSearchApiFnCall;
+                return commonAPI(args);  
+            },
             placeDetails: function (args) {
                 args._errorMsg = defaults.placeDetailsErr;
                 args._parser = parsePDJSON;
                 args._apiFnCall = defaults._placeDetailsApiFnCall;
                 return commonAPI(args);
+            },
+            setDefaults: function(args) {
+                angular.extend(defaults, args);
             }
         };
     };
 
-    this.$get.$inject = ['$q', 'gMaps', 'gPlaces', '$window'];
+    this.$get.$inject = ['$rootScope', '$q', 'gMaps', 'gPlaces', '$window'];
 
     this.setDefaults = function (args) {
         angular.extend(defaults, args);
