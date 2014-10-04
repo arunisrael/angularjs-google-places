@@ -137,7 +137,7 @@ provider('ngGPlacesAPI', function () {
             radarSearch: function (args) {
                 args._errorMsg = defaults.radarSearchErr;
                 args._parser = parseRSJSON;
-                args._apiFnCall = defaults._placeDetailsApiFnCall;
+                args._apiFnCall = defaults._radarSearchApiFnCall;
                 return commonAPI(args);
             },
             setDefaults: function(args) {
