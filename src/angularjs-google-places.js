@@ -26,7 +26,7 @@ provider('ngGPlacesAPI', function () {
         _textSearchApiFnCall: 'textSearch',
         _nearbySearchApiFnCall: 'nearbySearch',
         _placeDetailsApiFnCall: 'getDetails',
-        _radarSearchApiFnCall: 'radarsearch'
+        _radarSearchApiFnCall: 'radarSearch'
     };
 
     var parseNSJSON = function (response) {
