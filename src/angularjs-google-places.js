@@ -122,7 +122,7 @@ provider('ngGPlacesAPI', function () {
                 return commonAPI(args);
             },
             textSearch: function(args) {
-                args._genLocation = true;
+                args._genLocation = false;
                 args._errorMsg = defaults.textSearchErr;
                 args._parser = parseTSJSON;
                 args._apiFnCall = defaults._textSearchApiFnCall;
