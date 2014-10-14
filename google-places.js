@@ -18,15 +18,12 @@ provider('ngGPlacesAPI', function () {
         textSearchKeys: ['formatted_address','geometry','id','name','place_id','price_level','rating','reference','types'],
         nearbySearchKeys: ['geometry','id','name','place_id','rating','reference','types'],
         placeDetailsKeys: ['formatted_address','formatted_phone_number','geometry','html_attributions','icon','id','international_phone_number','name','opening_hours','photos','place_id','price_level','rating','reference','reviews','types', 'vicinity','website'],
-        radarSearchKeys: ['geometry', 'place_id'],
+        textSearchErr: 'Unable to find by text',
         nearbySearchErr: 'Unable to find nearby places',
         placeDetailsErr: 'Unable to find place details',
-        radarSearchErr: 'Unable to find search details',
-        textSearchErr: 'Unable to find text details',
         _textSearchApiFnCall: 'textSearch',
         _nearbySearchApiFnCall: 'nearbySearch',
-        _placeDetailsApiFnCall: 'getDetails',
-        _radarSearchApiFnCall: 'radarSearch'
+        _placeDetailsApiFnCall: 'getDetails'
     };
 
     var parseNSJSON = function (response) {
@@ -42,22 +39,9 @@ provider('ngGPlacesAPI', function () {
         return pResp;
     };
 
-    var parseTSJSON = function (response) {
+  var parseTSJSON = function (response) {
         var pResp = [];
         var keys = defaults.textSearchKeys;
-        response.map(function (result) {
-            var obj = {};
-            angular.forEach(keys, function (k) {
-                obj[k] = result[k];
-            });
-            pResp.push(obj);
-        });
-        return pResp;
-    };
-
-    var parseRSJSON = function (response) {
-        var pResp = [];
-        var keys = defaults.radarSearchKeys;
         response.map(function (result) {
             var obj = {};
             angular.forEach(keys, function (k) {
@@ -132,12 +116,6 @@ provider('ngGPlacesAPI', function () {
                 args._errorMsg = defaults.placeDetailsErr;
                 args._parser = parsePDJSON;
                 args._apiFnCall = defaults._placeDetailsApiFnCall;
-                return commonAPI(args);
-            },
-            radarSearch: function (args) {
-                args._errorMsg = defaults.radarSearchErr;
-                args._parser = parseRSJSON;
-                args._apiFnCall = defaults._radarSearchApiFnCall;
                 return commonAPI(args);
             },
             setDefaults: function(args) {
