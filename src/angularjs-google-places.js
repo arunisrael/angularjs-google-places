@@ -64,7 +64,7 @@ provider('ngGPlacesAPI', function () {
         return pResp;
     };
 
-    this.$get = function ($rootScope, $q, gMaps, gPlaces, $window) {
+    this.$get = function ($q, gMaps, gPlaces, $window) {
 
         function commonAPI(args) {
             var req = angular.copy(defaults, {});
@@ -74,13 +74,9 @@ provider('ngGPlacesAPI', function () {
 
             function callback(results, status) {
                 if (status == gPlaces.PlacesServiceStatus.OK) {
-                    $rootScope.$apply(function () {
-                        return deferred.resolve(req._parser(results));
-                    });
+                  return deferred.resolve(req._parser(results));
                 } else {
-                    $rootScope.$apply(function () {
-                        deferred.reject(req._errorMsg);
-                    });
+                  deferred.reject(req._errorMsg);
                 }
             }
             if (req._genLocation) {
@@ -125,7 +121,7 @@ provider('ngGPlacesAPI', function () {
         };
     };
 
-    this.$get.$inject = ['$rootScope', '$q', 'gMaps', 'gPlaces', '$window'];
+    this.$get.$inject = ['$q', 'gMaps', 'gPlaces', '$window'];
 
     this.setDefaults = function (args) {
         angular.extend(defaults, args);
