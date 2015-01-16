@@ -1,7 +1,7 @@
 {
-  "name": "angularjs-google-places-fork",
-  "version": "0.1.1",
-  "homepage": "https://github.com/lautarobock/angularjs-google-places",
+  "name": "angularjs-google-places",
+  "version": "0.1.0",
+  "homepage": "https://github.com/arunisrael/angularjs-google-places",
   "authors": [
     "Arun Israel <arun.israel@gmail.com>"
   ],

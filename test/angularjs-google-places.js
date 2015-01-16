@@ -3,9 +3,9 @@
 describe('Service: ngGPlacesAPI', function () {
     var ngGPlacesAPI, $rootScope;
 
-    beforeEach(module('ngGPlaces', 'mockedNearbySearch',
+    beforeEach(module('ngGPlaces', 'mockedNearbySearch','mockedTextSearch',
         'mockedPlaceDetails', function ($provide, ngGPlacesAPIProvider,
-            defaultNSJSON, defaultPDJSON) {
+            defaultNSJSON, defaultPDJSON, defaultTSJSON) {
             $provide.value('gPlaces', {
                 PlacesService: function () {
                     this.nearbySearch = function (req, cb) {
@@ -13,6 +13,9 @@ describe('Service: ngGPlacesAPI', function () {
                     };
                     this.getDetails = function (req, cb) {
                         cb(defaultPDJSON, true);
+                    };
+                    this.textSearch = function (req, cb) {
+                        cb(defaultTSJSON, true);
                     };
                 },
                 PlacesServiceStatus: {
@@ -59,6 +62,29 @@ describe('Service: ngGPlacesAPI', function () {
             });
             $rootScope.$apply();
             expect(results.length).toEqual(20);
+            expect(results[0].name).not.toBeUndefined();
+            expect(results[1].vicinity).not.toBeUndefined();
+            expect(results[2].reference).not.toBeUndefined();
+        });
+    });
+
+    describe('Text Search', function () {
+        beforeEach(inject(function (_ngGPlacesAPI_, _$rootScope_) {
+            ngGPlacesAPI = _ngGPlacesAPI_;
+            $rootScope = _$rootScope_;
+        }));
+
+        it('should return places for a location searched by text', function () {
+            var results = ngGPlacesAPI.textSearch({
+                latitude: -33.8665433,
+                longitude: 151.1956316,
+                radius: 10,
+                query: 'city name'
+            }).then(function (data) {
+                results = data;
+            });
+            $rootScope.$apply();
+            expect(results.length).toEqual(19);
             expect(results[0].name).not.toBeUndefined();
             expect(results[1].vicinity).not.toBeUndefined();
             expect(results[2].reference).not.toBeUndefined();
