@@ -25,9 +25,9 @@ provider('ngGPlacesAPI', function () {
         _placeDetailsApiFnCall: 'getDetails'
     };
 
-    var parseNSJSON = function (response) {
+    var parseNSJSON = function (response, req) {
         var pResp = [];
-        var keys = defaults.nearbySearchKeys;
+        var keys = req.nearbySearchKeys;
         response.map(function (result) {
             var obj = {};
             angular.forEach(keys, function (k) {
@@ -38,9 +38,9 @@ provider('ngGPlacesAPI', function () {
         return pResp;
     };
 
-    var parsePDJSON = function (response) {
+    var parsePDJSON = function (response, req) {
         var pResp = {};
-        var keys = defaults.placeDetailsKeys;
+        var keys = req.placeDetailsKeys;
         angular.forEach(keys, function (k) {
             pResp[k] = response[k];
         });
@@ -57,7 +57,7 @@ provider('ngGPlacesAPI', function () {
 
             function callback(results, status) {
                 if (status == gPlaces.PlacesServiceStatus.OK) {
-                  return deferred.resolve(req._parser(results));
+                  return deferred.resolve(req._parser(results, req));
                 } else {
                   deferred.reject(req._errorMsg);
                 }
